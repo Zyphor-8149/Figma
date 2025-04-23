@@ -1,0 +1,36 @@
+{
+  "name": "figma",
+  "version": "1.0.0",
+  "description": "A simple Electron-based Figma UI project",
+  "main": "main.js",
+  "author": {
+    "name": "Atish Mughal",
+    "email": "zyphor@figma.dev"
+  },
+  "homepage": "https://zyphor.dev",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . Figma --platform=win32 --arch=x64 --icon=figmalogo.ico --overwrite",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^35.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  
+"build": {
+  "appId": "com.zyphor.figma",
+  "productName": "Figma",
+  "files": [
+    "**/*"
+  ],
+  "linux": {
+    "target": ["AppImage", "deb", "rpm", "snap"],
+    "category": "Utility",
+    "maintainer": "Atish Mughal <zyphor@figma.dev>"
+  },
+  "icon": "build/icons/512x512.png"
+}
+
+
+}

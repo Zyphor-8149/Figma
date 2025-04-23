@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Figma</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #1e1e1e;
+      font-family: sans-serif;
+    }
+
+    webview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #loadingScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #1e1e1e;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+
+    .logo {
+      height: 30px;
+      margin-bottom: 20px;
+    }
+
+    .progressBarContainer {
+      width: 150px;
+      height: 4px;
+      background-color: #333;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .progressBar {
+      height: 100%;
+      width: 0%;
+      background-color: white;
+      transition: width 0.1s linear;
+    }
+
+    #errorScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2e2e2e;
+  color: #fff;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.error-icon {
+  width: 80px;
+  height: 80px;
+  opacity: 0.8;
+}
+
+#errorScreen h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+#errorScreen p {
+  margin: 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+#errorScreen button {
+  margin-top: 10px;
+  background-color: #ff5e4d;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#errorScreen button:hover {
+  background-color: #e74c3c;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <img src="figma.png" alt="" class="logo">
+    <div class="progressBarContainer">
+      <div class="progressBar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Error Screen -->
+  <div id="errorScreen">
+    <div class="error-content">
+      <img src="wifi-exclamation.png" alt="No Internet Icon" class="error-icon" />
+      <h2>No Internet Connection</h2>
+      <p>Please check your connection and try again.</p>
+      <button id="retryBtn">Retry</button>
+    </div>
+  </div>
+  <!-- Figma WebView -->
+  <webview id="webview" src="https://www.figma.com/"></webview>
+
+  <script>
+    const webview = document.getElementById('webview');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const errorScreen = document.getElementById('errorScreen');
+    const progressBar = document.getElementById('progressBar');
+    const retryBtn = document.getElementById('retryBtn');
+  
+    let loadingInterval;
+  
+    function showErrorScreen() {
+      loadingScreen.style.display = 'none';
+      errorScreen.style.display = 'flex';
+    }
+  
+    function showLoadingScreen() {
+      loadingScreen.style.display = 'flex';
+      loadingScreen.style.opacity = '1';
+      errorScreen.style.display = 'none';
+      progressBar.style.width = '0%';
+    }
+  
+    function tryLoadWebview() {
+      if (!navigator.onLine) {
+        showErrorScreen();
+        return;
+      }
+  
+      showLoadingScreen();
+  
+      // Manually reload webview
+      webview.src = "https://www.figma.com/";
+    }
+  
+    // Start progress bar animation
+    webview.addEventListener('did-start-loading', () => {
+      let width = 0;
+      loadingInterval = setInterval(() => {
+        if (width < 95) {
+          width += 1;
+          progressBar.style.width = width + '%';
+        }
+      }, 20);
+    });
+  
+    webview.addEventListener('did-stop-loading', () => {
+      clearInterval(loadingInterval);
+      progressBar.style.width = '100%';
+      setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => loadingScreen.style.display = 'none', 400);
+      }, 300);
+    });
+  
+    webview.addEventListener('did-fail-load', (e) => {
+      clearInterval(loadingInterval);
+      showErrorScreen();
+    });
+  
+    retryBtn.addEventListener('click', () => {
+      tryLoadWebview();
+    });
+  
+    // Initial load attempt
+    tryLoadWebview();
+  </script>
+  
+
+</body>
+</html>
